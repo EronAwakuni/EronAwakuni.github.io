@@ -1,2 +1,2 @@
-# Eron.Awakuni.github.io
+# EronAwakuni.github.io
 Professional Data Analytics Portfolio
