@@ -1,0 +1,425 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eron Awakuni | Data Analytics Portfolio</title>
+
+<style>
+:root {
+    --navy: #14263d;
+    --blue: #315b80;
+    --light: #f4f6f9;
+    --white: #ffffff;
+    --text: #263445;
+    --muted: #667487;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: var(--light);
+    color: var(--text);
+    line-height: 1.7;
+}
+
+header {
+    background: var(--navy);
+    color: white;
+    padding: 20px 8%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+header h2 {
+    font-size: 20px;
+}
+
+nav {
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+nav a:hover {
+    color: #a9c9e8;
+}
+
+.hero {
+    background: var(--navy);
+    color: white;
+    padding: 90px 8% 100px;
+}
+
+.hero-content {
+    max-width: 850px;
+}
+
+.hero .eyebrow {
+    color: #a9c9e8;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.hero h1 {
+    font-size: clamp(36px, 6vw, 58px);
+    line-height: 1.15;
+    margin: 18px 0;
+}
+
+.hero p {
+    max-width: 700px;
+    color: #d6e0eb;
+    font-size: 18px;
+}
+
+.hero-button {
+    display: inline-block;
+    margin-top: 28px;
+    padding: 12px 24px;
+    background: white;
+    color: var(--navy);
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+section {
+    padding: 70px 8%;
+}
+
+.section-heading {
+    margin-bottom: 30px;
+}
+
+.section-heading h2 {
+    font-size: 30px;
+    color: var(--navy);
+}
+
+.section-heading p {
+    color: var(--muted);
+    margin-top: 8px;
+}
+
+.about {
+    background: white;
+}
+
+.about-content {
+    max-width: 850px;
+}
+
+.about-content p {
+    margin-bottom: 16px;
+}
+
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 22px;
+}
+
+.project-card {
+    background: white;
+    padding: 28px;
+    border-radius: 8px;
+    border: 1px solid #e1e6ed;
+    box-shadow: 0 3px 12px rgba(20,38,61,0.04);
+}
+
+.project-card h3 {
+    color: var(--navy);
+    margin-bottom: 12px;
+}
+
+.project-card p {
+    color: var(--muted);
+    font-size: 15px;
+    margin-bottom: 16px;
+}
+
+.project-tag {
+    display: inline-block;
+    background: #eaf0f6;
+    color: var(--blue);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin: 3px 3px 3px 0;
+}
+
+.skills {
+    background: white;
+}
+
+.skill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 25px;
+}
+
+.skill-group {
+    padding: 20px;
+    border-left: 3px solid var(--blue);
+    background: var(--light);
+}
+
+.skill-group h3 {
+    color: var(--navy);
+    margin-bottom: 10px;
+}
+
+.skill-group p {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.contact {
+    background: var(--navy);
+    color: white;
+    text-align: center;
+}
+
+.contact h2 {
+    font-size: 30px;
+    margin-bottom: 15px;
+}
+
+.contact p {
+    color: #d6e0eb;
+}
+
+footer {
+    background: #0d1b2b;
+    color: #aab6c4;
+    text-align: center;
+    padding: 22px;
+    font-size: 13px;
+}
+
+@media (max-width: 600px) {
+    header {
+        padding: 18px 6%;
+    }
+
+    nav {
+        gap: 14px;
+    }
+
+    .hero {
+        padding: 65px 6%;
+    }
+
+    section {
+        padding: 55px 6%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>Eron Awakuni</h2>
+    <nav>
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#skills">Skills</a>
+        <a href="#contact">Contact</a>
+    </nav>
+</header>
+
+<main>
+
+<section class="hero">
+    <div class="hero-content">
+        <div class="eyebrow">Data Analytics | Problem Solving | Technology</div>
+
+        <h1>Turning Information Into Actionable Insights.</h1>
+
+        <p>
+            A professional background in investigative analysis,
+            technology support, and problem-solving, with a growing
+            focus on data analytics, reporting, and process improvement.
+        </p>
+
+        <a class="hero-button" href="#projects">Explore My Projects</a>
+    </div>
+</section>
+
+<section class="about" id="about">
+    <div class="about-content">
+        <div class="section-heading">
+            <h2>About Me</h2>
+            <p>Analytical thinking built through diverse professional experience.</p>
+        </div>
+
+        <p>
+            My professional experience spans law enforcement,
+            sports medicine, and educational technology. Across
+            these fields, I have consistently relied on gathering
+            information, evaluating evidence, identifying patterns,
+            and developing solutions to complex problems.
+        </p>
+
+        <p>
+            My investigative background involved examining incidents,
+            analyzing evidence, identifying contributing factors,
+            and developing conclusions based on available information.
+            In technology support, I have applied that same
+            problem-solving approach to troubleshooting systems
+            and improving operational processes.
+        </p>
+
+        <p>
+            I am expanding these analytical capabilities into
+            data analytics, with an emphasis on data collection,
+            organization, reporting, visualization, and
+            evidence-based decision-making.
+        </p>
+    </div>
+</section>
+
+<section id="projects">
+    <div class="section-heading">
+        <h2>Projects & Practical Experience</h2>
+        <p>Demonstrating analytical thinking through practical applications.</p>
+    </div>
+
+    <div class="project-grid">
+
+        <article class="project-card">
+            <h3>Project Forge</h3>
+            <p>
+                Designed and developed a personal health data
+                management application. Defined the application
+                architecture, data organization, tracking features,
+                and automated calculations. Used AI-assisted coding
+                and independently evaluated, tested, and troubleshot
+                implementation issues.
+            </p>
+            <span class="project-tag">Data Management</span>
+            <span class="project-tag">Application Design</span>
+            <span class="project-tag">Problem Solving</span>
+        </article>
+
+        <article class="project-card">
+            <h3>Automated Repair Data Collection</h3>
+            <p>
+                Designed a data collection process using a form
+                and an automated script to organize submitted
+                repair information and populate the appropriate
+                spreadsheet worksheets. Focused on improving
+                data entry consistency and reducing manual
+                organization.
+            </p>
+            <span class="project-tag">Data Collection</span>
+            <span class="project-tag">Automation</span>
+            <span class="project-tag">Excel</span>
+        </article>
+
+        <article class="project-card">
+            <h3>Investigative Analysis</h3>
+            <p>
+                Applied systematic information gathering,
+                evidence evaluation, pattern identification,
+                and root-cause analysis throughout investigative
+                work in law enforcement and sports medicine.
+            </p>
+            <span class="project-tag">Critical Thinking</span>
+            <span class="project-tag">Research</span>
+            <span class="project-tag">Root Cause Analysis</span>
+        </article>
+
+    </div>
+</section>
+
+<section class="skills" id="skills">
+    <div class="section-heading">
+        <h2>Skills & Capabilities</h2>
+        <p>Technical tools and analytical capabilities.</p>
+    </div>
+
+    <div class="skill-grid">
+
+        <div class="skill-group">
+            <h3>Data & Reporting</h3>
+            <p>
+                Excel, spreadsheet organization,
+                data collection, reporting,
+                and data analysis development.
+            </p>
+        </div>
+
+        <div class="skill-group">
+            <h3>Technology</h3>
+            <p>
+                Google Workspace, Microsoft 365,
+                application troubleshooting,
+                process automation, and AI-assisted development.
+            </p>
+        </div>
+
+        <div class="skill-group">
+            <h3>Analytical Methods</h3>
+            <p>
+                Evidence evaluation, pattern recognition,
+                root-cause analysis, critical thinking,
+                and problem-solving.
+            </p>
+        </div>
+
+        <div class="skill-group">
+            <h3>Professional Experience</h3>
+            <p>
+                Investigations, operational support,
+                information gathering, documentation,
+                and cross-functional communication.
+            </p>
+        </div>
+
+    </div>
+</section>
+
+<section class="contact" id="contact">
+    <h2>Let's Connect</h2>
+    <p>
+        Interested in data analytics, reporting,
+        and opportunities to turn information
+        into meaningful solutions.
+    </p>
+    <p style="margin-top: 18px;">
+        Contact information coming soon.
+    </p>
+</section>
+
+</main>
+
+<footer>
+    <p>© 2026 Eron Awakuni | Professional Portfolio</p>
+</footer>
+
+</body>
+</html>
