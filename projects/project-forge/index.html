@@ -743,7 +743,7 @@
 
     <h2 class="section-title">Sample Data &amp; CSV Export</h2>
     <div class="card">
-      <p class="hint">Load the full fictional portfolio dataset (January 1–November 20, 2026) to see the charts and dashboard filled in. This replaces the workouts, food, weight, HRV, sleep, emotion and goal data saved in this browser, so export a backup first if any of it is real.</p>
+      <p class="hint">Load a month of fictional sample data to see every chart and dashboard filled in. This replaces the workouts, food, weight, HRV, sleep, emotion and goal data saved in this browser, so export a backup first if any of it is real.</p>
       <div class="btn-row">
         <button id="loadDemoData" class="btn-gold">Load Sample Data</button>
         <button id="clearAllData" class="btn-danger">Clear All Data</button>
@@ -1034,11 +1034,18 @@
       <div class="card">
         <p class="hint">Take a new photo of a barcode or Nutrition Facts label, or pick one you already took — either fills the form below for you to check and edit before saving.</p>
         <div class="btn-row">
-          <button id="openBarcodeScan" class="btn-gold">Scan Barcode</button>
-          <button id="openLabelScan" class="btn-gold">Scan Nutrition Label</button>
+          <button id="openBarcodeScan" class="btn-gold">Take Barcode Photo</button>
+          <button id="openBarcodeGallery" class="btn-ghost">Barcode from Gallery</button>
+        </div>
+        <div class="btn-row">
+          <button id="openLabelScan" class="btn-gold">Take Label Photo</button>
+          <button id="openLabelGallery" class="btn-ghost">Label from Gallery</button>
         </div>
       </div>
-      <input type="file" accept="image/*" id="scanPhotoInput" style="display:none;">
+      <!-- Camera input: capture asks supported mobile browsers to open the rear camera. -->
+      <input type="file" accept="image/*" capture="environment" id="scanCameraInput" style="display:none;">
+      <!-- Gallery input: deliberately has no capture attribute. -->
+      <input type="file" accept="image/*" id="scanGalleryInput" style="display:none;">
 
       <h2 class="section-title">Add Food</h2>
       <div class="card">
@@ -1406,13 +1413,12 @@
 <script>
 /* ==========================================================
    PORTFOLIO / DEMO MODE
-   All records below are fictional sample data for portfolio visitors.
-   Dates and random seed are fixed so every new visitor starts with the
-   same January 1-November 20, 2026 demonstration dataset.
-   Visitor edits are saved locally in that visitor's browser.
+   Set PORTFOLIO_MODE to true ONLY in the copy you publish on a website.
+   Visitors with empty browser storage then see a month of fictional
+   sample data instead of a blank app. Nothing in it is real, and
+   nothing a visitor does is sent anywhere: it stays in their browser.
    ========================================================== */
-const PORTFOLIO_MODE = true;
-const DEMO_DATA_VERSION = "forge-portfolio-2026-v2";
+const PORTFOLIO_MODE = false;
 const DATA_KEYS = ["forgeWorkouts","forgeFoodDB","forgeFoodLog","forgeWeightLog","forgeGoals","forgeHrvLog","forgeSleepLog","forgeEmotionLog"];
 
 function makeActivatable(el, label, handler){
@@ -1426,152 +1432,152 @@ function makeActivatable(el, label, handler){
 }
 
 function buildDemoData(){
-  let seed = 20261120;
+  let seed = 20260115;
   const rand = () => {
     seed = (seed + 0x6D2B79F5) | 0;
     let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+  const between = (a, b) => a + rand() * (b - a);
   const pick = (arr) => arr[Math.floor(rand() * arr.length)];
   const p2 = (n) => String(n).padStart(2, "0");
+  const dateBack = (back) => { const d = new Date(); d.setDate(d.getDate() - back); return d; };
   const iso = (d) => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`;
-  const fromISO = (s) => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
-  const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
   let counter = 0;
   const uid = (p) => `demo-${p}-${++counter}`;
+  const DAYS = 35;
 
   const data = {
     forgeWorkouts: [], forgeFoodDB: [], forgeFoodLog: [], forgeWeightLog: [],
-    forgeGoals: { calorieGoal: 2350, weightGoal: 200 },
+    forgeGoals: { calorieGoal: 1900, weightGoal: 178 },
     forgeHrvLog: [], forgeSleepLog: [], forgeEmotionLog: []
   };
 
   const FOODS = {
-    oatmeal: { name: "Oatmeal with banana", servingSize: "1 bowl", calories: 430, protein: 15, carbs: 76, fat: 8 },
-    eggs: { name: "Eggs and whole-grain toast", servingSize: "3 eggs + 2 slices toast", calories: 500, protein: 32, carbs: 40, fat: 20 },
-    yogurt: { name: "Greek yogurt with berries", servingSize: "1 cup yogurt + 1/2 cup berries", calories: 350, protein: 30, carbs: 40, fat: 6 },
-    breakfastBurrito: { name: "Egg and turkey breakfast burrito", servingSize: "1 burrito", calories: 490, protein: 32, carbs: 48, fat: 17 },
-    chickenRice: { name: "Chicken and rice bowl", servingSize: "6 oz chicken + 1 cup rice + vegetables", calories: 720, protein: 55, carbs: 82, fat: 15 },
-    turkeySandwich: { name: "Turkey sandwich", servingSize: "Whole-grain sandwich with turkey and cheese", calories: 650, protein: 45, carbs: 65, fat: 20 },
-    tunaWrap: { name: "Tuna wrap", servingSize: "1 large wrap", calories: 620, protein: 42, carbs: 60, fat: 18 },
-    beefBowl: { name: "Lean beef burrito bowl", servingSize: "1 bowl", calories: 740, protein: 48, carbs: 78, fat: 22 },
-    salmon: { name: "Salmon with roasted potatoes", servingSize: "6 oz salmon + potatoes + vegetables", calories: 780, protein: 50, carbs: 70, fat: 30 },
-    chili: { name: "Turkey chili", servingSize: "1 large bowl", calories: 650, protein: 48, carbs: 60, fat: 20 },
-    chickenPasta: { name: "Chicken pasta", servingSize: "1 plate", calories: 780, protein: 55, carbs: 90, fat: 20 },
-    beefPotatoes: { name: "Lean steak with potatoes", servingSize: "5 oz steak + potatoes + vegetables", calories: 760, protein: 52, carbs: 60, fat: 28 },
-    shake: { name: "Whey protein shake", servingSize: "1 scoop mixed with water", calories: 220, protein: 40, carbs: 8, fat: 3 },
-    cottageCheese: { name: "Cottage cheese", servingSize: "1 cup", calories: 250, protein: 30, carbs: 12, fat: 8 },
-    appleAlmonds: { name: "Apple and almonds", servingSize: "1 apple + 1 oz almonds", calories: 320, protein: 8, carbs: 40, fat: 18 },
-    bananaPeanut: { name: "Banana with peanut butter", servingSize: "1 banana + 1 tbsp peanut butter", calories: 300, protein: 8, carbs: 40, fat: 12 }
+    oatmeal: { name: "Oatmeal with banana", servingSize: "1 cup cooked + 1 banana", calories: 310, protein: 9, carbs: 58, fat: 5 },
+    eggs:    { name: "Scrambled eggs (3)", servingSize: "3 large eggs", calories: 240, protein: 18, carbs: 2, fat: 17 },
+    yogurt:  { name: "Greek yogurt", servingSize: "1 cup (170g)", calories: 150, protein: 15, carbs: 9, fat: 4 },
+    bowl:    { name: "Chicken & rice bowl", servingSize: "1 bowl", calories: 620, protein: 48, carbs: 70, fat: 12 },
+    chili:   { name: "Turkey chili", servingSize: "1 of 6 servings this recipe makes", calories: 380, protein: 32, carbs: 34, fat: 12, isRecipe: true },
+    salmon:  { name: "Salmon with potatoes", servingSize: "1 plate", calories: 640, protein: 42, carbs: 48, fat: 28 },
+    steak:   { name: "Steak and vegetables", servingSize: "6 oz steak + veg", calories: 700, protein: 55, carbs: 20, fat: 42 },
+    shake:   { name: "Protein shake", servingSize: "1 scoop + water", calories: 180, protein: 30, carbs: 6, fat: 3 },
+    almonds: { name: "Almonds", servingSize: "1 oz (28g)", calories: 170, protein: 6, carbs: 6, fat: 15 },
+    apple:   { name: "Apple", servingSize: "1 medium", calories: 95, protein: 0, carbs: 25, fat: 0 }
   };
   Object.values(FOODS).forEach(f => data.forgeFoodDB.push({ ...f, baseWeight: null }));
 
-  const logFood = (date, meal, food, servings = 1) => data.forgeFoodLog.push({
-    id: uid("food"), date, meal, name: food.name, servingSize: food.servingSize,
-    servings, calories: Math.round(food.calories * servings), protein: Math.round(food.protein * servings * 10) / 10,
-    carbs: Math.round(food.carbs * servings * 10) / 10, fat: Math.round(food.fat * servings * 10) / 10
-  });
+  const logFood = (date, meal, f, servings) => {
+    const m = (v) => Math.round(v * servings * 100) / 100;
+    data.forgeFoodLog.push({
+      id: uid("f"), date, meal, name: f.name, servingSize: f.servingSize, servings,
+      calories: m(f.calories), protein: m(f.protein), carbs: m(f.carbs), fat: m(f.fat)
+    });
+  };
 
   const S = (reps, weight) => ({ reps: String(reps), weight: String(weight) });
-  const standard = (name, sets, reps, weight, rpe = "7") => ({
-    name, sets: Array.from({ length: sets }, () => S(reps, weight)), rpe, individual: false
-  });
+  const rpe = () => String(pick([7, 7, 8, 8, 9]));
+  const std = (name, n, reps, weight) => ({ name, sets: Array.from({ length: n }, () => S(reps, weight)), rpe: rpe(), individual: false });
 
-  const buildWorkout = (dateObj, week) => {
-    const date = iso(dateObj);
-    const day = dateObj.getDay();
-    const squatWeight = 135 + Math.min(10, Math.floor(week / 4)) * 5;
-    const benchWeight = 105 + Math.min(9, Math.floor(week / 5)) * 5;
-    const cleanWeight = 75 + Math.min(9, Math.floor(week / 5)) * 5;
-    const duration = (mins) => mins * 60;
-
-    if(day === 1){
-      return { date, type: "Strength", name: "Lower Body Strength", hiitFormat: null,
-        exercises: [
-          { name: "Squat", sets: [S(5,squatWeight),S(5,squatWeight),S(5,squatWeight),S(5,squatWeight),S(4,squatWeight)], rpe: "7", individual: true },
-          standard("Romanian Deadlift", 3, 8, 115 + Math.min(8,Math.floor(week/6))*5, "7"),
-          standard("Dumbbell Split Squat", 3, 10, 25, "7")
-        ], durationSeconds: duration(48 + Math.floor(rand()*8)) };
+  const buildWorkout = (dow, week, date) => {
+    const up = (base, step) => base + week * step;
+    const dur = () => 3300 + Math.round(between(-300, 600));
+    if(dow === 1){
+      const w = up(205, 5);
+      const squat = { name: "Squat", sets: [S(5,w), S(5,w), S(5,w), S(rand() > 0.5 ? 5 : 4, w), S(4, w - (rand() > 0.5 ? 5 : 0))], rpe: rpe(), individual: true };
+      return { date, type: "Strength", name: "Lower Body", hiitFormat: null, exercises: [squat, std("Romanian Deadlift", 3, 8, up(185, 5))], durationSeconds: dur() };
     }
-    if(day === 3){
-      return { date, type: "Strength", name: "Upper Body Strength", hiitFormat: null,
-        exercises: [
-          { name: "Bench Press", sets: [S(5,benchWeight),S(5,benchWeight),S(5,benchWeight),S(5,benchWeight)], rpe: "7", individual: true },
-          standard("Barbell Row", 3, 8, 95 + Math.min(8,Math.floor(week/6))*5, "7"),
-          standard("Dumbbell Shoulder Press", 3, 10, 30, "7"),
-          standard("Lat Pulldown", 3, 10, 100, "7")
-        ], durationSeconds: duration(45 + Math.floor(rand()*10)) };
+    if(dow === 2){
+      const w = up(95, 5);
+      const press = { name: "Shoulder Press", sets: [S(5,w), S(5,w), S(5,w), S(4,w), S(4, w - 5)], rpe: rpe(), individual: true };
+      const superset = { isGroup: true, groupType: "superset", groupLabel: "Superset",
+        exercises: [std("Tricep Pushdown", 3, 12, 50), { name: "Pull-up", sets: [S(8,""), S(8,""), S(7,"")], rpe: rpe(), individual: false }] };
+      return { date, type: "Strength", name: "Push", hiitFormat: null, exercises: [std("Bench Press", 4, 6, up(155, 5)), press, superset], durationSeconds: dur() };
     }
-    if(day === 4){
-      const clean = { name: "Power Clean", sets: [S(3,cleanWeight),S(3,cleanWeight),S(3,cleanWeight)], rpe: "7", individual: true };
+    if(dow === 3){
+      const sec = p2(Math.max(0, 50 - week * 5));
+      return { date, type: "Cardio", name: "Easy Run", hiitFormat: null,
+        exercises: [{ name: "Treadmill", type: "cardio", sets: [{ duration: "30 min", distance: `${(3.1 + rand() * 0.5).toFixed(1)} mi`, pace: `9:${sec}/mi` }] }],
+        durationSeconds: 1800 };
+    }
+    if(dow === 4){
       if(week % 2 === 0){
-        return { date, type: "HIIT", name: "Strength and Conditioning", hiitFormat: "AMRAP", durationSeconds: duration(28), exercises: [
-          clean,
-          { isGroup: true, groupType: "amrap", groupLabel: "AMRAP — 12 minutes", exercises: [
-            { name: "Kettlebell Swing", sets: [{ reps: "12", weight: "35" }] },
-            { name: "Push-ups", sets: [{ reps: "10", weight: "" }] },
-            { name: "Goblet Squat", sets: [{ reps: "12", weight: "35" }] }
-          ] }
-        ] };
+        return { date, type: "HIIT", name: "Conditioning", hiitFormat: "AMRAP", durationSeconds: 1500, exercises: [{
+          groupLabel: "AMRAP — 12 min", isGroup: true, groupType: "amrap",
+          exercises: [
+            { name: "Kettlebell Swing", sets: [{ reps: "15", weight: "53", duration: "", distance: "" }] },
+            { name: "Push-ups", sets: [{ reps: "12", weight: "", duration: "", distance: "" }] },
+            { name: "Box Jumps", sets: [{ reps: "10", weight: "", duration: "", distance: "" }] }
+          ] }] };
       }
-      return { date, type: "HIIT", name: "Intervals and Conditioning", hiitFormat: "EMOM", durationSeconds: duration(25), exercises: [
-        clean,
-        { isGroup: true, groupType: "emom", groupLabel: "EMOM — 10 minutes", exercises: [
-          { name: "Burpees", sets: [{ reps: "6", weight: "" }] },
-          { name: "Mountain Climbers", sets: [{ reps: "20", weight: "" }] }
-        ] }
-      ] };
+      return { date, type: "HIIT", name: "Conditioning", hiitFormat: "EMOM", durationSeconds: 1500, exercises: [{
+        groupLabel: "EMOM — 10 min", isGroup: true, groupType: "emom",
+        exercises: [
+          { name: "Power Clean", sets: [{ reps: "3", weight: String(up(115, 5)) }] },
+          { name: "Burpees", sets: [{ reps: "8", weight: "" }] }
+        ] }] };
     }
-    if(day === 6 || date === "2026-11-20"){
-      if(week % 2 === 0){
-        const miles = (2.6 + rand()*0.8).toFixed(1);
-        const pace = `10:${String(15 + Math.floor(rand()*35)).padStart(2,"0")}/mi`;
-        return { date, type: "Cardio", name: "Outdoor Roadwork", hiitFormat: null,
-          exercises: [{ name: "Roadwork", type: "cardio", sets: [{ duration: "28–36 min", distance: `${miles} mi`, pace }] }],
-          durationSeconds: duration(32) };
-      }
-      const distance = (2.8 + rand()*0.5).toFixed(1);
-      return { date, type: "Cardio", name: "Treadmill Run", hiitFormat: null,
-        exercises: [{ name: "Treadmill", type: "cardio", sets: [{ duration: "30–35 min", distance: `${distance} mi`, pace: "10:15–11:00/mi" }] }],
-        durationSeconds: duration(33) };
+    if(dow === 5){
+      return { date, type: "Strength", name: "Pull / Full Body", hiitFormat: null,
+        exercises: [std("Deadlift", 3, 5, up(255, 10)), std("Barbell Row", 3, 8, up(135, 5))], durationSeconds: dur() };
+    }
+    if(dow === 6){
+      return { date, type: "Mobility", name: "Mobility Flow", hiitFormat: null,
+        exercises: [{ name: "Hips & hamstrings", type: "mobility", sets: [{ duration: "15 min" }] }], durationSeconds: 900 };
     }
     return null;
   };
 
-  const start = fromISO("2026-01-01");
-  const end = fromISO("2026-11-20");
-  const totalDays = Math.round((end - start) / 86400000);
-  for(let offset = 0; offset <= totalDays; offset++){
-    const d = addDays(start, offset);
+  const rng = (a, b) => Math.round(between(a, b));
+
+  for(let back = DAYS - 1; back >= 0; back--){
+    const d = dateBack(back);
     const date = iso(d);
-    const week = Math.floor(offset / 7);
-    const workout = buildWorkout(d, week);
-    if(workout) data.forgeWorkouts.push(workout);
+    const dow = d.getDay();
+    const week = Math.floor((DAYS - 1 - back) / 7);
+    const progress = (DAYS - 1 - back) / (DAYS - 1);
 
-    // Four fictional food entries per day; the deterministic choices keep
-    // the baseline identical for every visitor and every fresh browser.
-    const breakfasts = [FOODS.oatmeal, FOODS.eggs, FOODS.yogurt, FOODS.breakfastBurrito];
-    const lunches = [FOODS.chickenRice, FOODS.turkeySandwich, FOODS.tunaWrap, FOODS.beefBowl];
-    const dinners = [FOODS.salmon, FOODS.chili, FOODS.chickenPasta, FOODS.beefPotatoes];
-    const snacks = [FOODS.shake, FOODS.cottageCheese, FOODS.appleAlmonds, FOODS.bananaPeanut];
-    logFood(date, "Breakfast", pick(breakfasts));
-    logFood(date, "Lunch", pick(lunches));
-    logFood(date, "Dinner", pick(dinners));
-    logFood(date, "Snack", pick(snacks));
-    logFood(date, "Evening Snack", pick([FOODS.yogurt, FOODS.appleAlmonds, FOODS.shake, FOODS.cottageCheese]), 0.5);
+    if(rand() > 0.1){ const w = buildWorkout(dow, week, date); if(w) data.forgeWorkouts.push(w); }
+
+    if(rand() > 0.08){
+      logFood(date, "Breakfast", rand() > 0.5 ? FOODS.oatmeal : FOODS.eggs, 1);
+      if(rand() > 0.5) logFood(date, "Breakfast", FOODS.yogurt, 1);
+      logFood(date, "Lunch", FOODS.bowl, pick([1, 1, 1, 1.25]));
+      const dinner = pick([FOODS.salmon, FOODS.steak, FOODS.chili, FOODS.chili]);
+      logFood(date, "Dinner", dinner, dinner === FOODS.chili ? pick([1, 1.5]) : 1);
+      logFood(date, "Snack", FOODS.shake, 1);
+      const extra = pick([FOODS.almonds, FOODS.apple, null]);
+      if(extra) logFood(date, "Snack", extra, 1);
+      if(rand() < 0.12) logFood(date, "Snack", FOODS.almonds, 2);
+    }
+
+    if(rand() > 0.12){
+      const base = 186.2 - progress * 2.9 + between(-0.5, 0.5);
+      data.forgeWeightLog.push({ id: uid("w"), date, weight: Math.round(base * 10) / 10, period: "Morning" });
+      if(rand() > 0.75) data.forgeWeightLog.push({ id: uid("w"), date, weight: Math.round((base + between(0.6, 1.6)) * 10) / 10, period: "Evening" });
+    }
+
+    if(rand() > 0.1) data.forgeHrvLog.push({ id: uid("h"), date, kind: "morning", value: Math.round(60 + progress * 4 + between(-9, 9) + (dow === 0 ? 4 : 0)) });
+    if(rand() > 0.25) data.forgeHrvLog.push({ id: uid("h"), date, kind: "night", value: Math.round(52 + progress * 3 + between(-8, 8)) });
+    if(rand() < 0.45) data.forgeHrvLog.push({ id: uid("h"), date, kind: "biofeedback", biofeedbackType: pick(["Resonance Breathing", "Heart Lock-In", "Coherence Training"]), duration: pick([10, 15, 20]) });
+
+    if(rand() > 0.08){
+      const length = Math.round(between(6, 8.6) * 4) / 4;
+      let q = length >= 8 ? 5 : length >= 7.5 ? 4 : length >= 7 ? 3 : length >= 6.5 ? 2 : 1;
+      if(rand() > 0.7) q -= 1;
+      data.forgeSleepLog.push({ id: uid("s"), date, length, quality: String(Math.min(5, Math.max(1, q))) });
+    }
+
+    if(rand() > 0.5){
+      data.forgeEmotionLog.push({
+        id: uid("e"), date,
+        emotions: { Joy: rng(3,8), Sadness: rng(0,3), Anger: rng(0,3), Fear: rng(0,2), Stress: rng(1,7), Anxiety: rng(0,5),
+                    Love: rng(4,9), Surprise: rng(0,3), Shame: rng(0,1), Guilt: rng(0,2), Content: rng(3,8) },
+        note: pick(["", "", "Good training day.", "Busy day at work.", "Slept well, felt calm.", "Rushed morning."])
+      });
+    }
   }
-
-  // Weekly morning weigh-ins: 208.0 lb on Jan 1, trending gradually to 200.0 lb.
-  for(let offset = 0; offset <= totalDays; offset += 7){
-    const d = addDays(start, offset);
-    const progress = offset / totalDays;
-    const variation = offset === 0 ? 0 : (rand() - 0.5) * 0.5;
-    const weight = Math.round((208 - 8 * progress + variation) * 10) / 10;
-    data.forgeWeightLog.push({ id: uid("weight"), date: iso(d), weight, period: "Morning" });
-  }
-  data.forgeWeightLog.push({ id: uid("weight"), date: "2026-11-20", weight: 200, period: "Morning" });
-
   return data;
 }
 
@@ -1584,11 +1590,10 @@ function writeDemoData(){
 (function autoSeedDemo(){
   if(!PORTFOLIO_MODE) return;
   try{
-    // Seed or upgrade once per demo version. After that, visitor changes
-    // remain saved in localStorage across refreshes and future visits.
-    if(localStorage.getItem("forgeDemoVersion") !== DEMO_DATA_VERSION){
+    const hasData = DATA_KEYS.some(k => localStorage.getItem(k));
+    if(!hasData && !localStorage.getItem("forgeDemoSeeded")){
       writeDemoData();
-      localStorage.setItem("forgeDemoVersion", DEMO_DATA_VERSION);
+      localStorage.setItem("forgeDemoSeeded", "1");
     }
   }catch(e){ /* storage blocked: the app just starts empty */ }
 })();
@@ -3096,27 +3101,16 @@ document.getElementById("saveRecipe").addEventListener("click", () => {
 });
 
 /* ==========================================================
-   SCAN — barcode photo + nutrition label photo
-   Both use a single photo taken with your phone's normal
-   camera app (via <input type="file" capture>), not a live
-   video stream — works the same on your saved file as it
-   does anywhere else, no server needed.
+   SCAN — one-shot camera photo or existing gallery photo
+   The camera is requested only after the user taps a button.
+   There is no live video stream and no background camera use.
 
-   Barcode path: reads the barcode from the photo using the
-   browser's built-in BarcodeDetector if available, otherwise
-   asks you to type the number — then looks it up at Open Food
-   Facts, a free, keyless public database. The only thing sent
-   over the network is the barcode number in the request URL —
-   no account, no cookies (credentials omitted), no referrer.
+   Barcode path: read the barcode from the selected photo with
+   BarcodeDetector when supported, then look it up at Open Food
+   Facts. If automatic reading is unavailable, allow manual entry.
 
-   Label path: reads the printed text off a photo of a
-   Nutrition Facts panel using Tesseract.js, an open-source text
-   reader that runs entirely on your phone once loaded. No
-   product database, no lookup — it only reads what's in the
-   photo. The library itself is fetched once from a public CDN
-   the first time you use this; after that your browser
-   typically caches it. Your photo is never uploaded anywhere
-   for this path.
+   Label path: read the Nutrition Facts text from the photo with
+   Tesseract.js. The photo itself is processed in the browser.
    ========================================================== */
 let scanMode = null; // "barcode" | "label"
 let lastScanResult = null;
@@ -3132,26 +3126,22 @@ function resetScanUI(){
   lastScanResult = null;
 }
 
-document.getElementById("openBarcodeScan").addEventListener("click", () => {
-  scanMode = "barcode";
-  document.getElementById("scanModalTitle").textContent = "Scan Barcode";
+function startPhotoScan(mode, source){
+  scanMode = mode;
+  document.getElementById("scanModalTitle").textContent = mode === "barcode" ? "Scan Barcode" : "Scan Nutrition Label";
   resetScanUI();
   document.getElementById("scanModal").classList.add("open");
-  document.getElementById("scanPhotoInput").click();
-});
-document.getElementById("openLabelScan").addEventListener("click", () => {
-  scanMode = "label";
-  document.getElementById("scanModalTitle").textContent = "Scan Nutrition Label";
-  resetScanUI();
-  document.getElementById("scanModal").classList.add("open");
-  document.getElementById("scanPhotoInput").click();
-});
+  const inputId = source === "camera" ? "scanCameraInput" : "scanGalleryInput";
+  document.getElementById(inputId).click();
+}
 
-document.getElementById("scanPhotoInput").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  e.target.value = ""; // so picking the same photo again still fires "change"
+document.getElementById("openBarcodeScan").addEventListener("click", () => startPhotoScan("barcode", "camera"));
+document.getElementById("openBarcodeGallery").addEventListener("click", () => startPhotoScan("barcode", "gallery"));
+document.getElementById("openLabelScan").addEventListener("click", () => startPhotoScan("label", "camera"));
+document.getElementById("openLabelGallery").addEventListener("click", () => startPhotoScan("label", "gallery"));
+
+async function processScanPhoto(file){
   if(!file) return;
-
   const imgUrl = URL.createObjectURL(file);
   document.getElementById("scanPreviewImg").src = imgUrl;
   document.getElementById("scanPreviewWrap").style.display = "block";
@@ -3161,11 +3151,20 @@ document.getElementById("scanPhotoInput").addEventListener("change", async (e) =
   document.getElementById("scanManualBarcode").style.display = "none";
 
   if(scanMode === "barcode") await handleBarcodePhoto(file);
-  else await handleLabelPhoto(file);
+  else if(scanMode === "label") await handleLabelPhoto(file);
+}
+
+["scanCameraInput", "scanGalleryInput"].forEach(inputId => {
+  document.getElementById(inputId).addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    e.target.value = ""; // allow selecting the same image again
+    await processScanPhoto(file);
+  });
 });
 
 document.getElementById("scanRetakeBtn").addEventListener("click", () => {
-  document.getElementById("scanPhotoInput").click();
+  // Retake always requests a new camera photo.
+  document.getElementById("scanCameraInput").click();
 });
 document.getElementById("closeScanModalBtn").addEventListener("click", () => {
   document.getElementById("scanModal").classList.remove("open");
@@ -4192,7 +4191,7 @@ document.getElementById("exportCsv").addEventListener("click", () => {
 
 /* ---------- sample data, reset, banner ---------- */
 document.getElementById("loadDemoData").addEventListener("click", () => {
-  if(!confirm("Load the full fictional portfolio dataset (January 1–November 20, 2026)? This REPLACES the workouts, food, weight, HRV, sleep, emotion and goal data currently saved in this browser. (Export a backup first if any of it is real.)")) return;
+  if(!confirm("Load a month of fictional sample data? This REPLACES the workouts, food, weight, HRV, sleep, emotion and goal data currently saved in this browser. (Export a backup first if any of it is real.)")) return;
   try{ writeDemoData(); }catch(e){ alert("Couldn't save sample data in this browser."); return; }
   location.reload();
 });
@@ -4205,7 +4204,7 @@ document.getElementById("clearAllData").addEventListener("click", () => {
 (function initBanner(){
   const banner = document.getElementById("siteBanner");
   try{ if(sessionStorage.getItem("forgeBannerDismissed")) banner.classList.add("hidden"); }catch(e){}
-  try{ if(localStorage.getItem("forgeDemoActive")) document.getElementById("sampleNote").textContent = " DEMO DATA: fictional sample records for portfolio testing; not personal health records."; }catch(e){}
+  try{ if(localStorage.getItem("forgeDemoActive")) document.getElementById("sampleNote").textContent = " Sample data is loaded: none of it is real."; }catch(e){}
   document.getElementById("dismissBanner").addEventListener("click", () => {
     banner.classList.add("hidden");
     try{ sessionStorage.setItem("forgeBannerDismissed", "1"); }catch(e){}
